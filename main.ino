@@ -107,7 +107,7 @@ void loop()
     digitalWrite(15, LOW);                  // Turn OFF Channel
     analogWrite(13, 0);                     // Turn OFF Light
     analogWrite(12, 0);                     // Turn OFF Motor
-    update_LCD_Settings();
+    update_LCD_Settings(lcd);               // Print LCD - Settings
     
     Serial.println("New Client.");          // print a message out in the serial port
     String currentLine = "";                // make a String to hold incoming data from the client
@@ -238,9 +238,9 @@ void loop()
     client.stop();
     Serial.println("Client disconnected.");
     Serial.println("");
+    lcd.clear(); // IDK maybe this will help
   }
   else {
-    update_LCD(lcd, temperatureC, temperatureF);
     if (temperatureF < tempLowValue)
     {
       digitalWrite(15, HIGH);
@@ -267,7 +267,7 @@ void loop()
     {
       analogWrite(12, 0);
     }
-
+    update_LCD(lcd, temperatureC, temperatureF);
     // SOME ISSUE WHEN LIGHTS ARE OFF AND MOISTURE ON = LCD IS FUCKED
   }
   
@@ -322,7 +322,7 @@ void update_LCD(LiquidCrystal_I2C lcd, float v1, float v2)
   
 }
 
-void update_LCD_Settings()
+void update_LCD_Settings(LiquidCrystal_I2C lcd)
 {
   lcd.setCursor(0,0);
   lcd.clear();
