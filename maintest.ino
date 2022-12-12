@@ -27,7 +27,7 @@ const int heatPin = 15;
 const int echoPin = 14;
 const int trigPin = 2;
 const int motorPin = 12;
-const int dutyCycle = 51;
+const int dutyCycle = 250;
 #define SOUND_VELOCITY 0.034
 #define CM_TO_INCH 0.393701
 
@@ -47,9 +47,9 @@ float temperatureC;
 float temperatureF;
 
 // --------------------- THIS IS HIGH LOW TEMP VARIABLES
-float tempValue = 72;
-float tempHighValue = 75;
-float tempLowValue = 70;
+float tempValue = 68;
+float tempHighValue = 70;
+float tempLowValue = 66;
 
 // GPIO where the DS18B20 is connected to
 const int oneWireBus = 0;     
@@ -71,6 +71,7 @@ float distanceInch = 0.0;
 
 // Water Pump Pulse System
 int water = 0;
+int pump_on = 0;
 
 void setup()
 {
@@ -85,7 +86,7 @@ void setup()
   pinMode(heatPin, OUTPUT);
 
   //LED 
-  pinMode(ledPin, OUTPUT); // LED 
+  pinMode(ledPin, INPUT); // LED 
 
   //MOIST - MOTOR
   pinMode(motorPin, OUTPUT);
@@ -124,7 +125,10 @@ void loop()
     digitalWrite(LED_BUILTIN,HIGH);         // Settings 
     digitalWrite(heatPin, LOW);                  // Turn OFF Channel
     analogWrite(ledPin, 0);                     // Turn OFF Light
-    analogWrite(motorPin, 0);                     // Turn OFF Motor
+    //analogWrite(motorPin, 0);                     // Turn OFF 
+    digitalWrite(motorPin, LOW);  // NEW
+    counter = 0;                                // Reset display count & counter
+    currentMode = 0;
     update_LCD_Settings(lcd);               // Print LCD - Settings
     
     Serial.println("New Client.");          // print a message out in the serial port
@@ -259,6 +263,7 @@ void loop()
     lcd.clear(); // IDK maybe this will help
   }
   else {
+
     if (temperatureF < tempLowValue)
     {
       digitalWrite(heatPin, HIGH);
@@ -267,7 +272,6 @@ void loop()
     {
       digitalWrite(heatPin, LOW);
     }
-    delay(500);
       
     soilMoisture();
     
@@ -275,30 +279,45 @@ void loop()
 
     //Output Moisture
     if (soilMoistValue == 0){
-      analogWrite(motorPin, 0);
+      //analogWrite(motorPin, 0);
+      digitalWrite(motorPin, LOW);  // NEW
     }
     else if (soilMoisturePercent < soilMoistLow)
     {
-      if (water == 4)
+      if (water < 1)
       {
-        analogWrite(motorPin, dutyCycle);
-        water = 0;
+        //analogWrite(motorPin, dutyCycle);
+        digitalWrite(motorPin, HIGH); // NEW
+        pump_on = 1;
+        lcd.clear();
       }
       else
       {
-        analogWrite(motorPin, 0);
-        water++;
+        //analogWrite(motorPin, 0);
+        digitalWrite(motorPin, LOW);  // NEW
+        pump_on = 0;
+        lcd.init();
       }
+      water++;
+      if (water >= 30)
+        water = 0;
     }
     else if (soilMoisturePercent > soilMoistHigh)
     {
-      analogWrite(motorPin, 0);
+      //analogWrite(motorPin, 0);
+      digitalWrite(motorPin, LOW);  // NEW
     }
-    update_LCD(lcd, temperatureC, temperatureF);
-  }
 
-  
-  
+    distanceSensor();
+    
+    delay(25);
+
+    if(pump_on == 0)
+    {
+      lcd.clear();
+      update_LCD(lcd, temperatureC, temperatureF);
+    }
+  }
 }
 
 void distanceSensor()
