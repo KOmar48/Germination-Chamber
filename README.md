@@ -1,5 +1,5 @@
 # Germination Chamber
- Senior Design Project
+Design Project
  
 The purpose of the Germination Chamber project is to create a controlled environment that allows users to set up ideal conditions for their plants to germinate at a higher yield compared to plants germinated in unregulated environments
 
@@ -8,4 +8,3 @@ The purpose of the Germination Chamber project is to create a controlled environ
 * Moisture Feedback Loops
 * Data Sampling
 
-Testing out hoe to push things. Into the REPO THIS IS TEST NUMBER DOZz
